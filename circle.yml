@@ -1,4 +1,15 @@
 test:
+ pre:
+  #adding the plugin not in the maven central
+    - mkdir -p $CIRCLE_TEST_REPORTS/pulgin
+    - wget -O $CIRCLE_TEST_REPORTS/pulgin/csv-1.0.jar "http://kasparov.skife.org/csv/csv-1.0.jar"
+    - mvn install:install-file -Dfile=$CIRCLE_TEST_REPORTS/pulgin/csv-1.0.jar -DgroupId=org.skife.kasparov -DartifactId=csv -Dversion=1.0 -Dpackaging=jar
+
+ override:
+    - mvn package -Pbenchmark -DskipTests -Denforcer.skip=true 
+    
  post:
+   - mkdir -p $CIRCLE_TEST_REPORTS/out/
+   - find . -type f -regex ".*/target/.*jar" -exec cp {} $CIRCLE_TEST_REPORTS/out/ \;
    - mkdir -p $CIRCLE_TEST_REPORTS/junit/
    - find . -type f -regex ".*/target/surefire-reports/.*xml" -exec cp {} $CIRCLE_TEST_REPORTS/junit/ \;
